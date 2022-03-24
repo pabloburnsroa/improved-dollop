@@ -1,2 +1,12 @@
-// Test app
-GET http://localhost:5001/
+// Get Envelopes
+GET http://localhost:5001/api/v1/envelopes/
+
+###
+// Create new envelope
+POST http://localhost:5001/api/v1/envelopes/
+Content-Type: application/json
+
+{
+  "title": "Going Out",
+  "budget": 250
+}

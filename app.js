@@ -1,11 +1,13 @@
 const express = require('express');
 require('dotenv').config({ path: './config/.env' });
 
-const app = express();
+const envelopesRouter = require('./routes/envelopes');
+const apiDocsRouter = require('./routes/apiDocs');
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+const app = express();
+app.use(express.json());
+app.use('/api-docs', apiDocsRouter);
+app.use('/api/v1/envelopes/', envelopesRouter);
 
 const PORT = process.env.PORT || 5001;
 

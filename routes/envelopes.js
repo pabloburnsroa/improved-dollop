@@ -162,4 +162,48 @@ router.put('/:id', updateEnvelope);
  */
 router.delete('/:id', deleteEnvelope);
 
+/**
+ * @openapi
+ * /api/v1/envelopes/{fromId}/transfer/{toId}:
+ *   post:
+ *     summary: Transfer budget from one envelope to another envelope
+ *     produces:
+ *       - application/json
+ *     tags: [Envelopes]
+ *     parameters:
+ *       - in: path
+ *         name: fromId
+ *         description: Origin envelope id
+ *         type: integer
+ *         required: true
+ *         example: 1
+ *       - in: path
+ *         name: toId
+ *         description: Destination envelope id
+ *         type: integer
+ *         required: true
+ *         example: 2
+ *     requestBody:
+ *       description: Amount of money to transfer
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: integert
+ *             example:
+ *               amount: 300
+ *     responses:
+ *       "201":
+ *         description: Returns updated envelopes
+ *       "400":
+ *         description: Envelope not found
+ *       "500":
+ *         description: Internal server error
+ *
+ */
+router.post('/:fromId/transfer/:toId', transfer);
+
 module.exports = router;

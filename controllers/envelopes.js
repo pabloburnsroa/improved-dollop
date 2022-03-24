@@ -1,6 +1,11 @@
 const dbEnvelopes = require('../models/db');
 const { createId } = require('../helpers/dbHelpers');
 
+/*
+TODO: Remove any reused code and create helper functions 
+TODO: Error checking
+*/
+
 exports.getEnvelopes = async (req, res, next) => {
   try {
     const envelopes = await dbEnvelopes;
@@ -27,7 +32,7 @@ exports.addEnvelope = async (req, res, next) => {
     // Push new envelope to envelopes DB
     envelopes.push(newEnvelope);
     // Success code 201 as per docs in routes/envelopes.js
-    res.status(201).send(newEnvelope);
+    return res.status(201).send(newEnvelope);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -49,7 +54,7 @@ exports.updateEnvelope = async (req, res, next) => {
     // Update envelope
     envelope.title = title;
     envelope.budget = budget;
-    res.status(201).send(envelopes);
+    return res.status(201).send(envelopes);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -59,7 +64,44 @@ exports.deleteEnvelope = async (req, res, next) => {
   try {
     const { id } = req.params;
     const envelopes = await dbEnvelopes;
+    // Find envelope with ID
+    const envelope = envelopes.find((e) => e.id === parseInt(id));
+    // Update envelopes array w/o envelope
+    const updatedEnvelopes = envelopes.filter((e) => e.id != envelope.id);
+    return res.status(204).send(updatedEnvelopes);
   } catch (err) {
-    res.status;
+    res.status(500).send(err);
+  }
+};
+
+exports.transfer = async (req, res, next) => {
+  try {
+    // Grab IDs from path
+    const { fromId, toId } = req.params;
+    // Grab amount to be transferred from req.body
+    const { amount } = req.body;
+
+    const envelopes = await dbEnvelopes;
+    // Retrive fromEnvelope and toEnvelope
+    const transferFrom = envelopes.find((e) => e.id === parseInt(fromId));
+    const transferTo = envelopes.find((e) => e.id === parseInt(toId));
+
+    /*
+    Error checking: is transfer amount larger than balance of origin envelope
+    */
+
+    if (transferFrom.budget < amount) {
+      console.log(transferFrom.budget);
+      return res.status(404).send({
+        message: 'Amount to be transferred exceeds the envelope budget',
+      });
+    }
+
+    transferFrom.budget -= amount;
+    transferTo.budget += amount;
+
+    return res.status(201).send(transferFrom);
+  } catch (err) {
+    res.status(500).send(err);
   }
 };
